@@ -54,6 +54,7 @@ def create_post():
     db.session.commit()
     return jsonify({'message': 'Post created'}), 201
 
+
 # Route to get a single post by ID
 @main.route('/api/posts/<int:id>', methods=['GET'])
 def get_post(id):
@@ -66,9 +67,13 @@ def get_post(id):
     })
 
 # Route to delete a post by ID
-@main.route('/api/posts/<int:id>', methods=['DELETE'])
-def delete_post(id):
-    post = Post.query.get_or_404(id)
+@main.route('/api/posts/<int:post_id>', methods=['DELETE'])
+@jwt_required()
+def delete_post(post_id):
+    post = Post.query.get(post_id)
+    if not post:
+        return jsonify({'message': 'Post not found'}), 404
+
     db.session.delete(post)
     db.session.commit()
-    return jsonify({'message': 'Post deleted'})
+    return jsonify({'message': 'Post deleted'}), 200
